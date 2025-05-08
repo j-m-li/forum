@@ -1,0 +1,9 @@
+      body { font-family: sans-serif; }
+        .hidden { display: none; }
+        .error { color: red; }
+        .success { color: green; }
+        .post { border-bottom: 1px solid #ccc; padding: 6px 0 6px 0; }
+        .post .meta { color: #888; font-size: 0.9em; }
+        .admin-btn { margin-left: 0.5em; font-size: 0.9em; }
+        mark { background: #ffd; }
+
