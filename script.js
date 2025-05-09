@@ -193,6 +193,7 @@ function register(event) {
                         document.getElementById('slide-captcha-success').style.display = 'block';
                         document.getElementById('slide-captcha-label').style.display = 'none';
                         registerBtn.disabled = false;
+                        document.getElementById('register_msg').innerHTML = ' ';
                         sessionStorage.setItem('slide_captcha_verified', '1');
                     } else {
                         handle.style.left = "0px";
