@@ -69,7 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         file_put_contents($file, json_encode($data));
         echo json_encode(['ok'=>true]);
     } else {
-        echo json_encode(['ok'=>false, 'error'=>'captchaIncorrect']);
+        echo json_encode(['ok'=>false, 'error'=>'captchaIncorrect', 'pos' => $pos]);
     }
     exit;
 }

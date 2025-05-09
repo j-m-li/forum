@@ -78,6 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'password' => password_hash($password, PASSWORD_DEFAULT)
     ];
     file_put_contents($userFile, json_encode($userData, JSON_PRETTY_PRINT));
+    unlink($file);
     echo json_encode(["ok" => true]);
     exit;
 }
