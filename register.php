@@ -7,10 +7,12 @@ header("Content-Type: application/json");
 require_once 'utils.php';
 $usersDir = "$dataDir/users/";
 $captchaDir = "$dataDir/captcha/";
+$challengeDir = "$dataDir/slidecaptcha/";
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $data = json_decode(file_get_contents("php://input"), true);
     $username = trim($data['username'] ?? '');
     $password = $data['password'] ?? '';
+    /*
     $captcha = $data['captcha'] ?? '';
     $captcha_id = $data['captcha_id'] ?? '';
     // Captcha validation
@@ -26,7 +28,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         http_response_code(400);
         echo json_encode(["ok" => false, "error" => "captchaIncorrect"]);
         exit;
+    }*/
+
+    $headers = getallheaders();
+    $id = null;
+    foreach ($headers as $name => $value) {
+        if (!strcasecmp($name, "x-slide-captcha-id")) {
+	    $id = $value;
+        }
     }
+
+    if (!$id) {
+        echo json_encode(["ok" => false, "error" => "captchaMissingOrExpired"]);
+        exit;
+    }
+    $file = $challengeDir . "challenge_$id.json";
+    if (!file_exists($file)) {
+        echo json_encode(["ok" => false, "error" => "captchaMissingOrExpired"]);
+        exit;
+    }
+    $challenge = json_decode(file_get_contents($file), true);
+    if (empty($challenge['verified']) || !empty($challenge['used'])) {
+        echo json_encode(["ok" => false, "error" => "captchaIncorrect"]);
+        exit;
+    }
+    // Mark challenge as used
+    $challenge['used'] = true;
+    file_put_contents($file, json_encode($challenge));
+
+
     if (!$username || !$password) {
         http_response_code(400);
         echo json_encode(["ok" => false, "error" => "usernamePasswordRequired"]);
@@ -51,3 +81,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     echo json_encode(["ok" => true]);
     exit;
 }
+echo json_encode(["ok"=>false,"error"=>"invalidAction"]);
+?>

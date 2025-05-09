@@ -73,6 +73,7 @@ function renderLogin(c) {
         + '</form>'
         + '<div id="login_msg"></div>';
 }
+/*
 function renderRegister(c) {
     c.innerHTML = ''
         + '<h2>' + t("registerH") + '</h2>'
@@ -88,6 +89,182 @@ function renderRegister(c) {
         + '<div id="register_msg"></div>';
     loadCaptcha();
 }
+
+function loadCaptcha() {
+    fetch('register_captcha.php?get=1')
+    .then(function(res){return res.json();})
+    .then(function(data){
+        document.getElementById('captcha_question').textContent = t("What is ") + data.question || '...';
+        document.getElementById('register_captcha_id').value = data.captcha_id || '';
+        document.getElementById('register_captcha').value = '';
+    });
+}
+function register(event) {
+    event.preventDefault();
+    var username = document.getElementById('register_username').value;
+    var password = document.getElementById('register_password').value;
+    var captcha = document.getElementById('register_captcha').value;
+    var captcha_id = document.getElementById('register_captcha_id').value;
+    fetch('register.php', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({username:username, password:password, captcha:captcha, captcha_id:captcha_id})
+    })
+    .then(function(res){return res.json();})
+    .then(function(data){
+        if (data.ok) {
+            document.getElementById('register_msg').innerText = t("registrationSuccess");
+        } else {
+            document.getElementById('register_msg').innerText = t(data.error);
+            loadCaptcha();
+        }
+    });
+}
+
+	*/
+    function renderRegister(c) {
+        c.innerHTML = ''
+            + '<h2>' + t("registerH") + '</h2>'
+            + '<form id="registerForm" onsubmit="register(event)">'
+            + t("username") + ' <input id="register_username" autocomplete="username"><br>'
+            + t("password") + ' <input type="password" id="register_password" autocomplete="new-password"><br>'
+            + '<div id="slide-captcha-box"></div>'
+            + '<button id="registerBtn" type="submit" disabled>' + t("register") + '</button>'
+            + '</form>'
+            + '<div id="register_msg"></div>';
+        setTimeout(initSlideCaptcha, 0);
+    }
+
+    function initSlideCaptcha() {
+        var box = document.getElementById('slide-captcha-box');
+        if (!box) return;
+        fetch('slide_captcha.php?get=1')
+        .then(function(res){return res.json();})
+        .then(function(data){
+            var id = data.id, width = data.width || 280;
+            sessionStorage.setItem('slide_captcha_id', id);
+            box.innerHTML = ''
+                + '<div id="slide-captcha-track" style="width:' + width + 'px">'
+                +   '<div id="slide-captcha-bar"></div>'
+                +   '<div id="slide-captcha-handle">→</div>'
+                + '</div>'
+                + '<div id="slide-captcha-label">'+t("slideToVerify")+'</div>'
+                + '<div id="slide-captcha-success">'+t("verified")+'</div>';
+            var track = document.getElementById('slide-captcha-track');
+            var bar = document.getElementById('slide-captcha-bar');
+            var handle = document.getElementById('slide-captcha-handle');
+            var registerBtn = document.getElementById('registerBtn');
+            var dragging = false, startX = 0, curX = 0, maxX = track.offsetWidth - handle.offsetWidth;
+
+            function onStart(e) {
+                if (box.classList.contains('captcha-verified')) return;
+                dragging = true;
+                startX = (e.touches ? e.touches[0].clientX : e.clientX) - handle.offsetLeft;
+                document.addEventListener('mousemove', onMove);
+                document.addEventListener('mouseup', onEnd);
+                document.addEventListener('touchmove', onMove);
+                document.addEventListener('touchend', onEnd);
+            }
+            function onMove(e) {
+                if (!dragging) return;
+                var clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                curX = Math.max(0, Math.min(clientX - startX, maxX));
+                handle.style.left = curX + "px";
+                bar.style.width = (curX + handle.offsetWidth/2) + "px";
+            }
+            function onEnd(e) {
+                if (!dragging) return;
+                dragging = false;
+                fetch('slide_captcha.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type':'application/json',
+                        'X-Slide-Captcha-ID': id
+                    },
+                    body: JSON.stringify({ pos: curX })
+                })
+                .then(function(res){return res.json();})
+                .then(function(result){
+                    if (result.ok) {
+                        handle.style.left = maxX + "px";
+                        bar.style.width = track.offsetWidth + "px";
+                        handle.classList.add("captcha-done");
+                        box.classList.add('captcha-verified');
+                        document.getElementById('slide-captcha-success').style.display = 'block';
+                        document.getElementById('slide-captcha-label').style.display = 'none';
+                        registerBtn.disabled = false;
+                        sessionStorage.setItem('slide_captcha_verified', '1');
+                    } else {
+                        handle.style.left = "0px";
+                        bar.style.width = "0px";
+                        handle.classList.remove("captcha-done");
+                        box.classList.remove('captcha-verified');
+                        document.getElementById('slide-captcha-success').style.display = 'none';
+                        document.getElementById('slide-captcha-label').style.display = '';
+                        registerBtn.disabled = true;
+                        document.getElementById('register_msg').innerHTML = '<span class="error">' + t("slideToVerifyError") + '</span>';
+                        sessionStorage.removeItem('slide_captcha_verified');
+                    }
+                });
+                document.removeEventListener('mousemove', onMove);
+                document.removeEventListener('mouseup', onEnd);
+                document.removeEventListener('touchmove', onMove);
+                document.removeEventListener('touchend', onEnd);
+            }
+            handle.addEventListener('mousedown', onStart);
+            handle.addEventListener('touchstart', onStart);
+            document.getElementById('registerForm').addEventListener('submit', function(ev){
+                if (!box.classList.contains('captcha-verified') || !sessionStorage.getItem('slide_captcha_verified')) {
+                    ev.preventDefault();
+                    document.getElementById('register_msg').innerHTML = '<span class="error">' + t("slideToVerifyError") + '</span>';
+                }
+            });
+            registerBtn.disabled = true;
+            sessionStorage.removeItem('slide_captcha_verified');
+        });
+    }
+
+    function register(event) {
+        event.preventDefault();
+        var box = document.getElementById('slide-captcha-box');
+        var id = sessionStorage.getItem('slide_captcha_id');
+        if (!box.classList.contains('captcha-verified') || !sessionStorage.getItem('slide_captcha_verified') || !id) {
+            document.getElementById('register_msg').innerHTML = '<span class="error">' + t("slideToVerifyError") + '</span>';
+            return;
+        }
+        var username = document.getElementById('register_username').value;
+        var password = document.getElementById('register_password').value;
+        fetch('register.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Slide-Captcha-ID': id
+            },
+            body: JSON.stringify({username:username, password:password})
+        })
+        .then(function(res){return res.json();})
+        .then(function(data){
+            if (data.ok) {
+                document.getElementById('register_msg').innerText = t("registrationSuccess");
+                sessionStorage.removeItem('slide_captcha_id');
+                sessionStorage.removeItem('slide_captcha_verified');
+            } else {
+                document.getElementById('register_msg').innerText = t(data.error);
+                if (document.getElementById('slide-captcha-handle')) {
+                    document.getElementById('slide-captcha-handle').style.left = "0px";
+                    document.getElementById('slide-captcha-bar').style.width = "0px";
+                    document.getElementById('slide-captcha-handle').classList.remove('captcha-done');
+                    box.classList.remove('captcha-verified');
+                    document.getElementById('slide-captcha-success').style.display = 'none';
+                    document.getElementById('slide-captcha-label').style.display = '';
+                    document.getElementById('registerBtn').disabled = true;
+                    sessionStorage.removeItem('slide_captcha_verified');
+                    setTimeout(initSlideCaptcha, 250);
+                }
+            }
+        });
+    }
+
 function renderChangePassword(c) {
     if (!isLoggedIn()) { showView("login"); return; }
     c.innerHTML = ''
@@ -372,36 +549,6 @@ function deleteModPost(threadId, postId) {
     .then(function(data){
         if (data.ok) showModeratePosts(threadId);
         else alert(t(data.error));
-    });
-}
-function loadCaptcha() {
-    fetch('register_captcha.php?get=1')
-    .then(function(res){return res.json();})
-    .then(function(data){
-        document.getElementById('captcha_question').textContent = t("What is ") + data.question || '...';
-        document.getElementById('register_captcha_id').value = data.captcha_id || '';
-        document.getElementById('register_captcha').value = '';
-    });
-}
-function register(event) {
-    event.preventDefault();
-    var username = document.getElementById('register_username').value;
-    var password = document.getElementById('register_password').value;
-    var captcha = document.getElementById('register_captcha').value;
-    var captcha_id = document.getElementById('register_captcha_id').value;
-    fetch('register.php', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({username:username, password:password, captcha:captcha, captcha_id:captcha_id})
-    })
-    .then(function(res){return res.json();})
-    .then(function(data){
-        if (data.ok) {
-            document.getElementById('register_msg').innerText = t("registrationSuccess");
-        } else {
-            document.getElementById('register_msg').innerText = t(data.error);
-            loadCaptcha();
-        }
     });
 }
 function changePassword(ev) {

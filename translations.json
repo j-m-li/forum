@@ -75,7 +75,10 @@
     "notPostAuthor": "Not the post author",
     "missingUsername": "Missing username",
     "cannotDeleteOwnAccount": "Cannot delete your own account",
-    "missingTheadIdOrContent": "missing threadId or content"
+    "missingTheadIdOrContent": "missing threadId or content",
+    "slideToVerify": "Slide to verify",
+    "slideToVerifyError": "Please complete the slide to verify captcha.",
+    "verified": "Verified!"
   },
   "fr": {
     "title": "Forum",
@@ -153,7 +156,10 @@
     "notPostAuthor": "Non l'auteur du message",
     "missingUsername": "Nom d'utilisateur manquant",
     "cannotDeleteOwnAccount": "Impossible de supprimer votre propre compte",
-    "missingTheadIdOrContent": "ID du sujet ou contenu manquant"
+    "missingTheadIdOrContent": "ID du sujet ou contenu manquant",
+    "slideToVerify": "Faites glisser pour vérifier",
+    "slideToVerifyError": "Veuillez compléter le captcha glissant.",
+    "verified": "Vérifié !"
   },
   "de": {
     "title": "Schwarzes Brett",
@@ -231,7 +237,10 @@
     "notPostAuthor": "Nicht der Autor des Beitrags",
     "missingUsername": "Benutzername fehlt",
     "cannotDeleteOwnAccount": "Eigenes Konto kann nicht gelöscht werden",
-    "missingTheadIdOrContent": "Thread-ID oder Inhalt fehlt"
+    "missingTheadIdOrContent": "Thread-ID oder Inhalt fehlt",
+    "slideToVerify": "Zum Bestätigen schieben",
+    "slideToVerifyError": "Bitte das Schiebecaptcha ausführen.",
+    "verified": "Bestätigt!"
   },
   "it": {
     "title": "Bacheca",
@@ -309,6 +318,9 @@
     "notPostAuthor": "Non sei l'autore del post",
     "missingUsername": "Nome utente mancante",
     "cannotDeleteOwnAccount": "Impossibile eliminare il proprio account",
-    "missingTheadIdOrContent": "ID discussione o contenuto mancante"
+    "missingTheadIdOrContent": "ID discussione o contenuto mancante",
+    "slideToVerify": "Trascina per verificare",
+    "slideToVerifyError": "Completa il captcha con la barra di scorrimento.",
+    "verified": "Verificato!"
   }
 }
