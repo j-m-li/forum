@@ -3,7 +3,7 @@
 // Made with the help of Copilot GPT-4.1
 //
 
-require_once 'utils.php';
+require_once 'xmlrpc.php';
 
 // Directory to store challenge files (make sure it's writable!)
 $challengeDir = "$dataDir/slidecaptcha/";

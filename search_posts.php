@@ -4,7 +4,7 @@
 //
 
 header("Content-Type: application/json");
-require_once 'utils.php';
+require_once 'xmlrpc.php';
 $query = strtolower(trim($_GET['q'] ?? ''));
 $threadId = $_GET['thread_id'] ?? null;
 if (!$query) {

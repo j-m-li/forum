@@ -4,7 +4,7 @@
 //
 
 header("Content-Type: application/json");
-require_once 'utils.php';
+require_once 'xmlrpc.php';
 $threads = [];
 $threadsDir = "$dataDir/threads";
 if (is_dir($threadsDir)) {

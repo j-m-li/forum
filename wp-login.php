@@ -4,7 +4,7 @@
 //
 
 header("Content-Type: application/json");
-require_once 'utils.php';
+require_once 'xmlrpc.php';
 $usersDir = "$dataDir/users/";
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $data = json_decode(file_get_contents("php://input"), true);

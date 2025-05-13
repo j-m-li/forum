@@ -2,7 +2,8 @@
 URL=$(WEBSITEFTP):sites/nocop.yright.it/
 
 all:  
-	scp .htaccess *.php *.ico *.html *.txt *.js *.css *.json $(URL)
+	scp .htaccess *.php *.ico *.html *.txt  $(URL)
+	scp -r wp-admin wp-includes wp-content data $(URL)
 	scp -r data $(URL)../
 	@echo ok!
 	

@@ -7,7 +7,7 @@
 
 function renderThreads(c) {
     c.innerHTML = "<h2>" + t("threads") + "</h2><div>" + t("loading") + "</div>";
-    fetch('index.php').then(function(res){return res.json();}).then(function(data){
+    fetch('threads.php').then(function(res){return res.json();}).then(function(data){
         if (!data.ok) { c.innerHTML = '<div class="error">'+t("errorLoadingThreads")+'</div>'; return; }
         var html = '<ul>';
         for (var i=0;i<data.threads.length;++i) {
@@ -21,7 +21,7 @@ function renderThreads(c) {
 }
 function renderThread(c, threadId) {
     c.innerHTML = "<div>" + t("loading") + "</div>";
-    fetch('thread.php?id='+encodeURIComponent(threadId)).then(function(res){return res.json();}).then(function(data){
+    fetch('wp-comments-post.php?id='+encodeURIComponent(threadId)).then(function(res){return res.json();}).then(function(data){
         if (!data.ok) { c.innerHTML = '<div class="error">'+t("threadNotFound")+'</div>'; return; }
         var thread = data.thread, posts = data.posts;
         var user = sessionStorage.getItem('username');
@@ -105,7 +105,7 @@ function register(event) {
     var password = document.getElementById('register_password').value;
     var captcha = document.getElementById('register_captcha').value;
     var captcha_id = document.getElementById('register_captcha_id').value;
-    fetch('register.php', {
+    fetch('wp-signup.php', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({username:username, password:password, captcha:captcha, captcha_id:captcha_id})
@@ -235,7 +235,7 @@ function register(event) {
         }
         var username = document.getElementById('register_username').value;
         var password = document.getElementById('register_password').value;
-        fetch('register.php', {
+        fetch('wp-signup.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -346,7 +346,7 @@ function renderUserDelete(c) {
 function renderModerate(c) {
     if (!isAdmin()) { c.innerHTML = "Admins only."; return; }
     c.innerHTML = "<div>" + t("loading") + "</div>";
-    fetch('index.php').then(function(res){return res.json();}).then(function(data){
+    fetch('threads.php').then(function(res){return res.json();}).then(function(data){
         if (!data.ok) { c.innerHTML = '<div class="error">'+escapeHtml(t(data.error||"Error"))+'</div>'; return; }
         var html = '<h2>' + t("adminModerate") + '</h2><ul>';
         for (var i=0;i<data.threads.length;++i) {
@@ -369,7 +369,7 @@ function login(ev) {
     ev.preventDefault();
     var u = document.getElementById('login_username').value;
     var p = document.getElementById('login_password').value;
-    fetch('login.php', {
+    fetch('wp-login.php', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({username: u, password: p})
@@ -429,7 +429,7 @@ function createThread(ev) {
 function postReply(ev, threadId) {
     ev.preventDefault();
     var content = document.getElementById('replyContent').value;
-    fetch('thread.php', {
+    fetch('wp-comments-post.php', {
         method: 'POST',
         headers: Object.assign(getAuthHeaders(),{'Content-Type':'application/json'}),
         body: JSON.stringify({thread_id: threadId, content: content})
@@ -445,7 +445,7 @@ function postReply(ev, threadId) {
 }
 function deleteMyPost(threadId, postId) {
     if (!confirm(t("deletePostConfirm"))) return;
-    fetch('thread.php', {
+    fetch('wp-comments-post.php', {
         method: 'DELETE',
         headers: Object.assign(getAuthHeaders(),{'Content-Type':'application/json'}),
         body: JSON.stringify({thread_id: threadId, post_id: postId})
@@ -457,7 +457,7 @@ function deleteMyPost(threadId, postId) {
     });
 }
 function modUser(username, action) {
-    fetch('admin_user.php', {
+    fetch('wp-admin/admin-ajax.php', {
         method: 'POST',
         headers: Object.assign(getAuthHeaders(),{'Content-Type':'application/json'}),
         body: JSON.stringify({username:username, action:action})
@@ -522,7 +522,7 @@ function deleteThread(threadId) {
 function showModeratePosts(threadId) {
     var ul = document.getElementById('mod-posts-' + threadId);
     if (ul.style.display === "none") {
-        fetch('thread.php?id='+encodeURIComponent(threadId)).then(function(res){return res.json();}).then(function(data){
+        fetch('wp-comments-post.php?id='+encodeURIComponent(threadId)).then(function(res){return res.json();}).then(function(data){
             if (!data.ok) { alert(t(data.error)); return; }
             var html = '';
             for (var i=0;i<data.posts.length;++i) {
@@ -604,7 +604,7 @@ function changePassword(ev) {
     }
     function loadTranslations(callback) {
         var xhr = new XMLHttpRequest();
-        xhr.open('GET', 'translations.json');
+        xhr.open('GET', 'wp-content/languages/translations.json');
         xhr.onreadystatechange = function() {
             if (xhr.readyState === 4 && xhr.status === 200) {
                 try {

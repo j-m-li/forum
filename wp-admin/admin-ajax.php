@@ -3,7 +3,7 @@
 // Made with the help of Copilot GPT-4.1
 //
 header("Content-Type: application/json");
-require_once 'utils.php';
+require_once '../xmprpc.php';
 $user = get_authenticated_user();
 if (!$user || empty($user['is_admin'])) {
     http_response_code(403);

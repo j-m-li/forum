@@ -5,7 +5,7 @@
 
 header("Content-Type: application/json");
 $method = $_SERVER['REQUEST_METHOD'];
-require_once 'utils.php';
+require_once 'xmlrpc.php';
 
 // GET: fetch thread and posts
 if ($method === 'GET') {

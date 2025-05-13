@@ -4,7 +4,7 @@
 //
 
 header("Content-Type: application/json");
-require_once 'utils.php';
+require_once 'xmlrpc.php';
 $user = get_authenticated_user();
 if (!$user || empty($user['is_admin'])) {
     http_response_code(403);

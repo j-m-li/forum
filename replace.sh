@@ -11,7 +11,8 @@ fi
 for file in "$@"; do
   if [ -f "$file" ]; then
     # Use sed to do an in-place replacement
-    sed -i 's/localStorage/sessionStorage/g' "$file"
+    #sed -i 's/localStorage/sessionStorage/g' "$file"
+    sed -i 's/utils.php/xmlrpc.php/g' "$file"
     echo "Replaced in $file"
   else
     echo "File not found: $file"

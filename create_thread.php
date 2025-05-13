@@ -4,7 +4,7 @@
 //
 
 header("Content-Type: application/json");
-require_once 'utils.php';
+require_once 'xmlrpc.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $user = get_authenticated_user();
